@@ -44,7 +44,12 @@ Create a file named `script.py` and add your Selenium automation script to it. T
 2.  Go to **Settings** > **Secrets and variables** > **Actions**.
 3.  Click **New repository secret** and add the following secrets:
     *   `MIU_EMAIL`: Your email address.
-    *   `MIU_PASSWORD`: Your password.
+    *   `MIU_PASSWORD`: Your password.  
+    
+NOTE: If you are trying to run the code on your desktop, add your credentials to your local environment, or just basically set that values as text in the code. On Powershell:
+    
+    setx MIU_EMAIL put_your_miu_email
+    setx MIU_PASSWORD put_your_miu_password
 
 ### Step 5: Create GitHub Actions Workflow
 
