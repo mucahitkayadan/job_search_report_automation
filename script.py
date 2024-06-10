@@ -22,8 +22,15 @@ two_days_ago = datetime.now() - timedelta(days=2)
 report_date = two_days_ago.strftime("%m/%d/%Y")
 
 # Initialize the WebDriver
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
+chrome_options.add_argument("--remote-debugging-port=9222")
+
 service = Service(ChromeDriverManager().install())
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 try:
     # Open the login page
