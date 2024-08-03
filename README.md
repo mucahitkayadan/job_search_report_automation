@@ -1,5 +1,5 @@
 MIU Job Search Report Automation
-=======================================
+======================================
 
 This repository contains a Selenium script that automates the process of logging into a website and submitting job application details. The script is scheduled to run daily using GitHub Actions.
 
