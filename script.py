@@ -2,6 +2,7 @@ import os
 import time
 import random
 from datetime import datetime, timedelta
+from typing import Optional
 
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -21,7 +22,16 @@ email = os.getenv("MIU_EMAIL_")
 password = os.getenv("MIU_PASSWORD_")
 url = "https://infosys.cs.miu.edu/infosys/index.jsp"
 
-def handle_login(driver):
+def handle_login(driver: webdriver.Chrome) -> None:
+    """
+    Handle the login process including MIU login and Microsoft authentication.
+    
+    Args:
+        driver: Chrome WebDriver instance
+        
+    Raises:
+        TimeoutException: If login elements are not found within timeout period
+    """
     # Initial MIU login
     driver.get(url)
     email_input = driver.find_element(By.NAME, 'j_username')
@@ -95,7 +105,16 @@ def handle_login(driver):
         print(f"Error during Microsoft login: {str(e)}")
         raise
 
-def fill_job_report(driver):
+def fill_job_report(driver: webdriver.Chrome) -> None:
+    """
+    Fill out the job search report form with random number of applications.
+    
+    Args:
+        driver: Chrome WebDriver instance
+        
+    Raises:
+        Exception: If there are any errors during form filling
+    """
     try:
         # Wait for the form to be fully loaded
         WebDriverWait(driver, 20).until(
@@ -147,13 +166,21 @@ def fill_job_report(driver):
         print(f"Current date value: {current_date}")
         raise
 
-def main():
+def main() -> None:
+    """
+    Main function to run the job search report automation.
+    Sets up the Chrome WebDriver and executes the login and form filling process.
+    """
     # Setup Chrome options
     chrome_options = Options()
-    if os.environ.get('GITHUB_ACTIONS'):
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--disable-software-rasterizer')
+    chrome_options.add_argument('--disable-extensions')
+    chrome_options.add_argument('--disable-infobars')
+    chrome_options.binary_location = "/usr/bin/chromium"  # Specify Chrome binary location
     
     # Setup Chrome driver
     service = Service(ChromeDriverManager().install())
