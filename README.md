@@ -1,26 +1,28 @@
 MIU Job Search Report Automation
 =======================================
 
-This repository contains a Selenium script that automates the process of logging into a website and submitting job application details. The script is scheduled to run daily using GitHub Actions.
+This repository contains a Selenium script that automates the process of logging into MIU's job search portal and submitting daily job application reports. The script runs daily using GitHub Actions and Docker.
 
 Features
 --------
 
-*   Automates login to the specified website.
-*   Enters job application details for the date two days ago.
-*   Uses environment variables for secure credential management.
+*   Automates login to MIU's job search portal.
+*   Handles Microsoft authentication.
+*   Automatically fills and submits job application reports.
+*   Uses Docker for consistent execution.
 *   Runs daily using GitHub Actions.
+*   Captures screenshots and logs for debugging.
 
 Prerequisites
 -------------
 
-*   Python 3.x
-*   A GitHub account
+*   Docker (for local testing)
+*   GitHub account (for automated runs)
 
 Setup Instructions
 ------------------
 
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 
     git clone https://github.com/mucahitkayadan/job_search_report_automation.git
     cd job_search_report_automation
@@ -51,65 +53,9 @@ NOTE: If you are trying to run the code on your desktop, add your credentials to
     setx MIU_EMAIL put_your_miu_email
     setx MIU_PASSWORD put_your_miu_password
 
-### Step 5: Create GitHub Actions Workflow
+### Step 5: Set up GitHub workflow:
 
-Create a directory named `.github/workflows` in the root of your repository. Inside this directory, create a YAML file named `main.yml` with the following content:
-
-    name: Run Selenium Script
-    
-    on:
-      push:
-        branches:
-          - main
-      pull_request:
-        branches:
-          - main
-      schedule:
-        - cron: '0 0 * * *'  # Runs daily at midnight
-    
-    jobs:
-      run-selenium-script:
-        runs-on: ubuntu-latest
-    
-        env:
-          MIU_EMAIL: ${{ secrets.MIU_EMAIL }}
-          MIU_PASSWORD: ${{ secrets.MIU_PASSWORD }}
-    
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v2
-    
-        - name: Set up Python
-          uses: actions/setup-python@v2
-          with:
-            python-version: '3.x'
-    
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install -r requirements.txt
-    
-        - name: Install Chrome
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y google-chrome-stable
-    
-        - name: Install ChromeDriver
-          run: |
-            sudo apt-get install -y unzip
-            curl -sS -o chromedriver_linux64.zip https://chromedriver.storage.googleapis.com/$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
-            unzip chromedriver_linux64.zip -d /usr/local/bin/
-            rm chromedriver_linux64.zip
-    
-        - name: Verify environment variables
-          run: |
-            echo "MIU_EMAIL: $MIU_EMAIL"
-            echo "MIU_PASSWORD: $MIU_PASSWORD"
-    
-        - name: Run Selenium script
-          run: |
-            python script.py
-      
+Copy the workflow file from the repository to your repository.
 
 ### Step 6: Commit and Push Changes
 
@@ -124,10 +70,35 @@ Create a directory named `.github/workflows` in the root of your repository. Ins
 2.  Check the status of the workflow runs.
 3.  Review logs to ensure everything is working correctly.
 
-Conclusion
-----------
+Automated Workflow
+-----------------
+The script automatically runs:
+* On every push to main branch
+* On pull requests to main branch
+* Daily at midnight (UTC)
 
-By following these steps, you have set up a Selenium script that runs daily using GitHub Actions. This script logs into a website, enters job application details, and submits the form. The setup ensures secure handling of credentials using GitHub Secrets.
+The workflow:
+1. Builds a Docker image
+2. Pushes it to GitHub Container Registry
+3. Runs the container with credentials
+4. Captures logs and screenshots
+5. Uploads artifacts for debugging
 
-Feel free to contribute and improve the script by submitting pull requests.
+Debugging
+---------
+* Check the Actions tab in GitHub for workflow runs
+* Download artifacts from failed runs to see screenshots
+* Review logs for detailed execution information
+
+Contributing
+-----------
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+License
+-------
+MIT License. See [LICENSE.md](LICENSE.md) for details.
 
