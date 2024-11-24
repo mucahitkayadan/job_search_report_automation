@@ -180,10 +180,10 @@ def main() -> None:
     chrome_options.add_argument('--disable-software-rasterizer')
     chrome_options.add_argument('--disable-extensions')
     chrome_options.add_argument('--disable-infobars')
-    chrome_options.binary_location = "/usr/bin/chromium"  # Specify Chrome binary location
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Updated binary location
     
-    # Setup Chrome driver
-    service = Service(ChromeDriverManager().install())
+    # Setup Chrome driver with version detection
+    service = Service(ChromeDriverManager(chrome_type="google-chrome").install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.maximize_window()
     

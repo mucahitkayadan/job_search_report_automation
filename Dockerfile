@@ -2,9 +2,13 @@ FROM python:3.9-slim-bullseye
 
 # Install Chrome and dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
-    chromium-driver \
+    wget \
+    gnupg2 \
     xvfb \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    google-chrome-stable \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -14,7 +18,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Set display port and Chrome options
 ENV DISPLAY=:99
-ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROME_BIN=/usr/bin/google-chrome
 
 WORKDIR /app
 
