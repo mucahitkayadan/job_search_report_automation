@@ -61,4 +61,15 @@ jobs:
         docker run \
           -e MIU_EMAIL=$MIU_EMAIL \
           -e MIU_PASSWORD=$MIU_PASSWORD \
+          -v ${PWD}/logs:/app/logs \
+          -v ${PWD}/screenshots:/app/screenshots \
           ghcr.io/${{ github.actor }}/selenium-script:latest
+
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: run-artifacts
+        path: |
+          logs/
+          screenshots/
