@@ -98,6 +98,29 @@ Contributing
 4. Push to the branch
 5. Create a Pull Request
 
+## Additional: Local Usage and Testing
+
+------------
+1. Pull the Docker image:
+```bash
+    docker pull ghcr.io/mucahitkayadan/job_search_report_automation/selenium-script:latest 
+```
+2. Run the Docker image:
+```bash
+    docker run -e MIU_EMAIL=your-miu-email-address -e MIU_PASSWORD=your-miu-stu-password -v ${PWD}/logs:/app/logs -v ${PWD}/screenshots:/app/screenshots ghcr.io/mucahitkayadan/selenium-script:latest
+```
+**Note:** Both Miu Microsoft and STU passwords are the same.
+
+### TODO
+
+- Connect to MongoDB and get the daily application number instead of randomly generated numbers.
+  - Find my resume generator:
+  `https://github.com/mucahitkayadan/Resume-Builder-TeX`
+  
+The user needs to be able to give their Resume Builder Tex (RBT) username and it should be retrieved automatically.
+
+- Now Microsoft and STU passwords are being used same, a different secret variable may be created for the ones who does not use them with the same password.
+
 License
 -------
 MIT License. See [LICENSE.md](LICENSE.md) for details.
