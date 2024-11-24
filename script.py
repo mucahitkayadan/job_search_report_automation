@@ -2,7 +2,6 @@ import os
 import time
 import random
 from datetime import datetime, timedelta
-from typing import Optional
 import logging
 
 from selenium import webdriver
@@ -10,10 +9,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -86,6 +85,67 @@ def handle_login(driver: webdriver.Chrome) -> None:
         
     except TimeoutException as e:
         logger.error(f"Error during Microsoft login: {str(e)}")
+        raise
+
+def fill_job_report(driver: webdriver.Chrome) -> None:
+    logger.info("Starting to fill job report")
+    try:
+        # Wait for the form to be fully loaded
+        WebDriverWait(driver, 20).until(
+            EC.presence_of_element_located((By.ID, 'toDate'))
+        )
+        logger.info("Form loaded successfully")
+
+        # Calculate the date
+        two_days_ago = datetime.now() - timedelta(days=2)
+        report_date = two_days_ago.strftime("%Y-%m-%d")
+        logger.info(f"Setting report date to: {report_date}")
+
+        # Set the date using JavaScript
+        date_script = f"""
+            let dateInput = document.getElementById('toDate');
+            dateInput.value = '{report_date}';
+            dateInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
+        """
+        driver.execute_script(date_script)
+        logger.info("Date set successfully")
+
+        # Wait a moment for the date to register
+        time.sleep(2)
+
+        # Select random number of applications
+        job_applications = random.randint(10, 15)
+        select_script = f"""
+            let select = document.getElementById('resumes');
+            select.value = '{job_applications}';
+            select.dispatchEvent(new Event('change', {{ bubbles: true }}));
+        """
+        driver.execute_script(select_script)
+        logger.info(f"Selected {job_applications} job applications")
+
+        # Wait a moment for the selection to register
+        time.sleep(2)
+
+        # Click the submit button
+        submit_script = """
+            document.getElementById('submitButton').click();
+        """
+        driver.execute_script(submit_script)
+        logger.info("Clicked submit button")
+
+        # Wait for submission to complete
+        time.sleep(3)
+        logger.info(f"Successfully submitted report: {job_applications} applications for {report_date}")
+
+    except Exception as e:
+        logger.error(f"Error filling form: {str(e)}")
+        # Get the current value of the date field for debugging
+        try:
+            current_date = driver.execute_script("return document.getElementById('toDate').value")
+            logger.error(f"Current date value when error occurred: {current_date}")
+        except:
+            pass
+        driver.save_screenshot('/app/screenshots/form_error.png')
         raise
 
 def main() -> None:
