@@ -194,10 +194,16 @@ def fill_job_report(driver: webdriver.Chrome) -> None:
         raise
 
 def capture_screenshot(driver, name):
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    screenshot_path = f"/app/screenshots/{name}_{timestamp}.png"
-    driver.save_screenshot(screenshot_path)
-    logger.info(f"Screenshot saved: {screenshot_path}")
+    try:
+        # Ensure screenshots directory exists
+        os.makedirs('/app/screenshots', exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        screenshot_path = f"/app/screenshots/{name}_{timestamp}.png"
+        driver.save_screenshot(screenshot_path)
+        logger.info(f"Screenshot saved: {screenshot_path}")
+    except Exception as e:
+        logger.error(f"Failed to save screenshot: {str(e)}")
 
 def main() -> None:
     """
