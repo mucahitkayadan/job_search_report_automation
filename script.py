@@ -41,39 +41,39 @@ def handle_login(driver: webdriver.Chrome) -> None:
 
     logger.info("Handling Microsoft login")
     try:
-        microsoft_email = WebDriverWait(driver, 10).until(
+        # Wait for and enter email
+        WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "i0116"))
-        )
-        microsoft_email.clear()
-        microsoft_email.send_keys(str(email))
+        ).send_keys(str(email))
         
         logger.info("Clicking Next")
-        next_button = WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "idSIButton9"))
-        )
-        next_button.click()
+        ).click()
+        
+        # Wait for page transition
+        time.sleep(2)
         
         logger.info("Entering Microsoft password")
-        microsoft_pwd = WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, "i0118"))
-        )
-        microsoft_pwd.clear()
-        microsoft_pwd.send_keys(str(password))
+        ).send_keys(str(password))
         
         logger.info("Clicking Sign in")
-        sign_in_button = WebDriverWait(driver, 10).until(
+        # Find the button again to avoid stale element
+        WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "idSIButton9"))
-        )
-        driver.execute_script("arguments[0].click();", sign_in_button)
+        ).click()
         
+        # Wait for page transition
         time.sleep(2)
         
         logger.info("Checking for Stay signed in prompt")
         try:
-            stay_signed_in = WebDriverWait(driver, 5).until(
+            # Find the button again for "Stay signed in"
+            WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "idSIButton9"))
-            )
-            stay_signed_in.click()
+            ).click()
             logger.info("Clicked Stay signed in")
         except TimeoutException:
             logger.info("No Stay signed in prompt found")
@@ -85,6 +85,7 @@ def handle_login(driver: webdriver.Chrome) -> None:
         
     except TimeoutException as e:
         logger.error(f"Error during Microsoft login: {str(e)}")
+        driver.save_screenshot('/app/screenshots/login_error.png')
         raise
 
 def fill_job_report(driver: webdriver.Chrome) -> None:
