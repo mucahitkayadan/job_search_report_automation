@@ -1,22 +1,15 @@
-name: Run Selenium Script
+name: Job Search Report Automation
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 3 * * *'  # Run at 3 AM UTC daily
+  workflow_dispatch:      # Allow manual triggers
 
 jobs:
   run-selenium-script:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
+    timeout-minutes: 15   # Add timeout
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -65,8 +58,10 @@ jobs:
         MIU_PASSWORD: ${{ secrets.MIU_PASSWORD }}
       run: |
         docker run \
+          --rm \
           -e MIU_EMAIL=$MIU_EMAIL \
           -e MIU_PASSWORD=$MIU_PASSWORD \
+          -e TZ=America/Chicago \
           -v ${{ github.workspace }}/logs:/app/logs \
           -v ${{ github.workspace }}/screenshots:/app/screenshots \
           ghcr.io/${{ github.actor }}/selenium-script:latest
