@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Load credentials from environment variables
 email = os.getenv("MIU_EMAIL")
 password = os.getenv("MIU_PASSWORD")
-url = "https://infosys.cs.miu.edu/infosys/index.jsp"
+url = "https://apps.cs.miu.edu/harmony/v1/hmi/secure/home"
 
 def handle_login(driver: webdriver.Chrome) -> None:
     logger.info("Starting login process")
