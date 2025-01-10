@@ -23,69 +23,38 @@ email = os.getenv("MIU_EMAIL")
 password = os.getenv("MIU_PASSWORD")
 url = "https://apps.cs.miu.edu/harmony/v1/hmi/secure/home"
 
-def handle_login(driver: webdriver.Chrome) -> None:
+def login(driver):
     logger.info("Starting login process")
     driver.get(url)
     
-    logger.info("Entering MIU credentials")
-    email_input = driver.find_element(By.NAME, 'j_username')
-    email_input.send_keys(str(email))
-    password_input = driver.find_element(By.NAME, 'j_password')
-    password_input.send_keys(str(password))
-    password_input.send_keys(Keys.RETURN)
-
-    logger.info("Waiting for Job Search Reports link")
-    WebDriverWait(driver, 10).until(
-        EC.element_to_be_clickable((By.LINK_TEXT, 'Job Search Reports'))
-    ).click()
-
-    logger.info("Handling Microsoft login")
     try:
         # Wait for and enter email
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "i0116"))
-        ).send_keys(str(email))
-        
-        logger.info("Clicking Next")
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, "idSIButton9"))
-        ).click()
-        
-        # Wait for page transition
-        time.sleep(2)
-        
-        logger.info("Entering Microsoft password")
-        WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "i0118"))
-        ).send_keys(str(password))
-        
-        logger.info("Clicking Sign in")
-        # Find the button again to avoid stale element
-        WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, "idSIButton9"))
-        ).click()
-        
-        # Wait for page transition
-        time.sleep(2)
-        
-        logger.info("Checking for Stay signed in prompt")
-        try:
-            # Find the button again for "Stay signed in"
-            WebDriverWait(driver, 5).until(
-                EC.element_to_be_clickable((By.ID, "idSIButton9"))
-            ).click()
-            logger.info("Clicked Stay signed in")
-        except TimeoutException:
-            logger.info("No Stay signed in prompt found")
-            
-        logger.info("Waiting for redirect to job search page")
-        WebDriverWait(driver, 20).until(
-            EC.presence_of_element_located((By.NAME, 'resumes'))
+        email_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "loginfmt"))
         )
+        email_input.send_keys(email)
+        email_input.send_keys(Keys.RETURN)
+        
+        # Wait for and enter password
+        password_input = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.NAME, "passwd"))
+        )
+        password_input.send_keys(password)
+        password_input.send_keys(Keys.RETURN)
+        
+        # Handle "Stay signed in?" prompt if it appears
+        try:
+            stay_signed_in = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "idSIButton9"))
+            )
+            stay_signed_in.click()
+        except TimeoutException:
+            logger.info("No 'Stay signed in' prompt found, continuing...")
+            
+        logger.info("Successfully logged in")
         
     except TimeoutException as e:
-        logger.error(f"Error during Microsoft login: {str(e)}")
-        driver.save_screenshot('/app/screenshots/login_error.png')
+        logger.error(f"Login failed: {str(e)}")
         raise
 
 def fill_job_report(driver: webdriver.Chrome) -> None:
@@ -164,7 +133,7 @@ def main() -> None:
     driver.maximize_window()
     
     try:
-        handle_login(driver)
+        login(driver)
         logger.info("Login successful")
         
         logger.info("Waiting for job search page")
